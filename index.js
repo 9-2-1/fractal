@@ -2,7 +2,7 @@ let draw = document.getElementById("draw");
 let depth_ = document.getElementById("depth_");
 let gl = draw.getContext("webgl");
 
-let program, po_wpos, po_scale, po_depth;
+let program, po_wpos, po_scale, po_depth, buffer;
 
 let tr_scale = 1;
 let tr_wpos = [0.5, 0];
