@@ -1,0 +1,50 @@
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+	<link rel="stylesheet" href="index.css" />
+	<title>z' = z² + c (z₀=0)</title>
+</head>
+
+<body>
+	<p></p>
+	<center>
+		<canvas id="draw"></canvas>
+		<br />
+		<input type="range" id="depth_" max="1000" min="1" value="100" />
+	</center>
+	<script src="index.js"></script>
+	<script type="x-shader/x-vertex" id="vertex-shader">
+		#version 100
+precision highp float;
+attribute vec2 position;
+varying vec2 v_position;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+	v_position = position;
+}
+</script>
+	<script type="x-shader/x-fragment" id="fragment-shader">
+		#version 100
+precision highp float;
+varying vec2 v_position;
+uniform vec2 wpos;
+uniform float scale;
+uniform int depth;
+void main() {
+	vec2 z = vec2(0.0, 0.0);
+	vec2 cc = v_position.xy * scale - wpos;
+	for(int i=0;i<1000;i+=1){
+		if(i>=depth) break;
+		//z = z^2-1;
+		z = vec2(z.x*z.x-z.y*z.y+cc.x,2.0*z.x*z.y+cc.y);
+	}
+	float res = sqrt(z.x*z.x+z.y*z.y) * 2.0;
+  gl_FragColor = vec4(1.0-res, 1.0-abs(res-1.0), 1.0-abs(res-2.0), 1.0);
+}
+</script>
+
+</body>
+
+</html>
