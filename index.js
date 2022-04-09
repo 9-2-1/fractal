@@ -1,5 +1,6 @@
 let draw = document.getElementById("draw");
 let depth_ = document.getElementById("depth_");
+let resolu_ = document.getElementById("resolu_");
 let gl = draw.getContext("webgl");
 
 let program, po_wpos, po_scale, po_depth, buffer;
@@ -7,6 +8,7 @@ let program, po_wpos, po_scale, po_depth, buffer;
 let tr_scale = 1;
 let tr_wpos = [0.5, 0];
 let tr_depth = 100;
+let resolu = 1;
 
 if (gl === null) {
 	alert("No webgl");
@@ -16,11 +18,13 @@ if (gl === null) {
 function modiScale() {
 	let scale = Math.min(
 		(document.body.clientWidth - 40),
-		(document.body.clientHeight - 40)
+		(document.body.clientHeight - 100)
 	);
-	draw.width = scale;
-	draw.height = scale;
-	gl.viewport(0, 0, scale, scale);
+	draw.style.width = scale + "px";
+	draw.style.height = scale + "px";
+	draw.width = scale * resolu;
+	draw.height = scale * resolu;
+	gl.viewport(0, 0, scale * resolu, scale * resolu);
 	draw.style.border = "1px white solid";
 }
 
@@ -129,6 +133,11 @@ window.addEventListener("load", function() {
 		depth_.addEventListener("change", function() {
 			tr_depth = depth_.value;
 			gl.uniform1i(po_depth, tr_depth);
+			gl.drawArrays(gl.TRIANGLES, 0, 6);
+		});
+		resolu_.addEventListener("change", function() {
+			resolu = resolu_.value;
+			modiScale();
 			gl.drawArrays(gl.TRIANGLES, 0, 6);
 		});
 	} catch (e) {

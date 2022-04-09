@@ -1,11 +1,8 @@
 body {
 	background: black;
+	color: white;
 }
 
 input {
 	width: 100%;
-}
-
-p {
-	color: white;
 }
