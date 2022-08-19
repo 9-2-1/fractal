@@ -44,25 +44,33 @@ let of_wpos = null;
 let of_scale = null;
 
 function dragCanvasMouse(event) {
-	if (event.type === "mousedown")
-		event.type = "touchstart";
-	else
-		event.type = "touchmove";
-	event.targetTouches = [{
+	let target = event.target;
+	let touches = [{
 		clientX: event.clientX,
 		clientY: event.clientY
 	}];
-	dragCanvasTouch(event);
+	if (event.type === "mousedown")
+		event = new MouseEvent("touchstart");
+	else
+		event = new MouseEvent("touchmove");
+	event.targetTouches = touches;
+	target.dispatchEvent(event);
 }
+
+let sum, div, cnt;
 
 function dragCanvasSize(event) {
 	of_wpos = [];
 	of_wpos[0] = tr_wpos[0] - sum[0] * tr_scale;
 	of_wpos[1] = tr_wpos[1] - sum[1] * tr_scale;
-	tr_scale *= Math.exp(event.wheelDelta / 120 * Math.ln(1.2));
+	tr_scale *= Math.exp(event.wheelDelta / 120 * Math.log(1.2));
 	tr_wpos[0] = of_wpos[0] + sum[0] * tr_scale;
 	tr_wpos[1] = of_wpos[1] + sum[1] * tr_scale;
 	of_wpos = null;
+	gl.uniform2fv(po_wpos, tr_wpos);
+	gl.uniform1f(po_scale, tr_scale);
+	gl.uniform1i(po_depth, tr_depth);
+	gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
 function dragCanvasStop(event) {
@@ -74,7 +82,7 @@ function dragCanvasStop(event) {
 function dragCanvasTouch(event) {
 	try {
 		let rect = event.target.getBoundingClientRect();
-		let sum = [0, 0],
+		sum = [0, 0],
 			div = 0,
 			cnt = 0;
 		let touches = event.targetTouches;
@@ -92,7 +100,7 @@ function dragCanvasTouch(event) {
 		sum[1] = 1 + -2 * ((sum[1] / cnt - rect.top) / rect.height);
 		div /= cnt - 1;
 		if (event.type === "touchmove") {
-			if (!isNaN(sum[0])) {
+			if (!isNaN(sum[0]) && of_wpos !== null) {
 				tr_wpos[0] = of_wpos[0] + sum[0] * tr_scale;
 				tr_wpos[1] = of_wpos[1] + sum[1] * tr_scale;
 				if (!isNaN(div)) {
@@ -117,6 +125,7 @@ function dragCanvasTouch(event) {
 		gl.drawArrays(gl.TRIANGLES, 0, 6);
 		event.preventDefault();
 	} catch (e) {
+		console.error(e);
 		alert(e.message);
 	}
 }
